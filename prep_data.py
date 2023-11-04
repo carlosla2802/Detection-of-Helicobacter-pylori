@@ -91,27 +91,44 @@ def prep_data_main(annotated_patches_path, labeled_patients_path, annotated_imag
 
     # Cargar metadata
     annotated_patches_df = load_metadata(annotated_patches_path)
-    labeled_patients_df = load_metadata(labeled_patients_path)
+    #labeled_patients_df = load_metadata(labeled_patients_path)
+    
+    # Separar los datos en infectados y no infectados
+    non_infected_patches_df = annotated_patches_df[annotated_patches_df['Presence'] == -1]
+    infected_patches_df = annotated_patches_df[annotated_patches_df['Presence'] == 1]
 
-    # Procesar imágenes anotadas
-    patches_data = process_annotated_images(annotated_patches_df, annotated_images_dir)
+    # Procesar imágenes anotadas de pacientes no infectados / infectados
+    non_infected_patches_data = process_annotated_images(non_infected_patches_df, annotated_images_dir)
+    infected_patches_data = process_annotated_images(infected_patches_df, annotated_images_dir)
 
-    # Preparar el conjunto de datos
-    patches_data_array, patches_labels_array = prepare_dataset(patches_data)
+    # Preparar el conjunto de datos de pacientes no infectados / infectados
+    non_infected_data_array,  non_infected_patches_labels_array = prepare_dataset(non_infected_patches_data)
+    infected_data_array, infected_patches_labels_array = prepare_dataset(infected_patches_data)
 
 
     # DATASET PREPROCESSING
 
-    # Convertir arrays de Numpy a tensores de PyTorch
-    patches_data_tensor, patches_labels_tensor = convert_to_tensors(patches_data_array, patches_labels_array)
+    # Convertir arrays de no infectados / infectados de Numpy a tensores de PyTorch
+    non_infected_patches_data_tensor, non_infected_patches_labels_tensor = convert_to_tensors(non_infected_data_array, non_infected_patches_labels_array)
+    infected_patches_data_tensor, infected_patches_labels_tensor = convert_to_tensors(infected_data_array, infected_patches_labels_array)
     
-    # Normalizar los datos si aún no lo están
-    patches_data_tensor = normalize_tensors(patches_data_tensor)
 
-    # Dividir los datos en entrenamiento y validación
-    X_train, X_val, y_train, y_val = split_data(patches_data_tensor, patches_labels_tensor)
+    # Normalizar los datos de no infectados / infectados si aún no lo están
+    non_infected_patches_data_tensor = normalize_tensors(non_infected_patches_data_tensor)
+    infected_patches_data_tensor = normalize_tensors(infected_patches_data_tensor)
+
+    # Dividir los datos en entrenamiento y validación (solo no infectados)
+    X_train, X_val, y_train, y_val = split_data(non_infected_patches_data_tensor, non_infected_patches_labels_tensor)
 
     # Crear DataLoaders
-    train_loader, val_loader = create_dataloaders(X_train, y_train, X_val, y_val)
+    non_infected_train_loader, non_infected_val_loader = create_dataloaders(X_train, y_train, X_val, y_val)
     
-    return train_loader, val_loader
+    # Crear DataLoader para los datos infectados (para la detección de anomalías)
+    anomaly_loader = DataLoader(dataset=TensorDataset(infected_patches_data_tensor, torch.ones(len(infected_patches_data_tensor))), batch_size=64, shuffle=False)
+
+
+    return non_infected_train_loader, non_infected_val_loader, anomaly_loader
+
+
+
+

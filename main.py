@@ -16,7 +16,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
     annotated_images_dir = 'AnnotatedPatches'
 
     # Preparar data
-    train_loader, val_loader = prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir)
+    non_infected_train_loader, non_infected_val_loader, anomaly_loader = prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir)
 
     # Crear o cargar el modelo
     if use_pretrained and pretrained_path:
@@ -34,7 +34,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
         num_epochs = 100 # Ajustar num epochs
         
         history = train_autoencoder(
-            autoencoder, criterion, optimizer, train_loader, val_loader, num_epochs, device
+            autoencoder, criterion, optimizer, non_infected_train_loader, non_infected_val_loader, num_epochs, device
             )
     
         if plot:
@@ -46,7 +46,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
 
     # Evaluar el modelo
-    reconstructions = evaluate_model(autoencoder, val_loader, device)
+    reconstructions = evaluate_model(autoencoder, non_infected_val_loader, device)
 
     if plot:
         # Visualizar rconstrucciones
