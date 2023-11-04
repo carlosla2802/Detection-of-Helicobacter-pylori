@@ -11,8 +11,8 @@ from datetime import datetime
 def main(use_pretrained=False, pretrained_path=None, plot=True):
 
     # Definir rutas a los archivos de metadatos y directorio de imágenes
-    annotated_patches_path = "window_metadata.csv"
-    labeled_patients_path = "metadata.csv"
+    annotated_patches_path = "metadata/window_metadata.csv"
+    labeled_patients_path = "metadata/metadata.csv"
     annotated_images_dir = 'AnnotatedPatches'
 
     # Preparar data
