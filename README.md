@@ -12,5 +12,6 @@ TO CHECK
 1. Preparación de datos
 2. Detección de contornos y definicion de Regiones de Interés
 3. Construcción y Entrenamiento del Autoencoder
+4. Evaluacion del Autoencoder
 
 TO CHECK
