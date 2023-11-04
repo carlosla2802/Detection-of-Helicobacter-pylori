@@ -7,10 +7,10 @@ The goal will be to apply AI techiques for the detection of HPylori in inmunohis
 
 
 
-TODO
+TO CHECK
 
 1. Preparación de datos
 2. Detección de contornos y definicion de Regiones de Interés
 3. Construcción y Entrenamiento del Autoencoder
 
-TODO
+TO CHECK
