@@ -20,6 +20,10 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
     # Crear o cargar el modelo
     if use_pretrained and pretrained_path:
+
+        # -- para MAC --
+        # device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        
         autoencoder = load_model(pretrained_path, Autoencoder, device)
         print("Modelo cargado desde:", pretrained_path)    
         
@@ -31,6 +35,11 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
         # Entrenar el modelo
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu"); autoencoder.to(device)
+        
+        # -- para MAC --
+        # device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        # autoencoder.to(device)
+        
         num_epochs = 100 # Ajustar num epochs
         
         history = train_autoencoder(
@@ -44,6 +53,8 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
         date = datetime.now().strftime("%Y%m%d_%H%M%S")
         save_model(autoencoder, f'autoencoder_{date}.pth')
 
+    # -- para MAC --
+    # autoencoder.to(device)
 
     # Evaluar el modelo
     reconstructions = evaluate_model(autoencoder, non_infected_val_loader, device)
