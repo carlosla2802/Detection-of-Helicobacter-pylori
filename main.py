@@ -22,7 +22,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
     non_infected_train_loader, non_infected_val_loader, validation_patches_data_tensor, validation_patches_labels = prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir, labeled_images_dir)
 
     # Crear o cargar el modelo
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu"); autoencoder.to(device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if use_pretrained and pretrained_path:
         autoencoder = load_model(pretrained_path, Autoencoder, device)
@@ -35,6 +35,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
         criterion = nn.MSELoss(); optimizer = torch.optim.Adam(autoencoder.parameters(), lr=0.001)
 
         # Entrenar el modelo
+        autoencoder.to(device)
         num_epochs = 10 # Ajustar num epochs
         
         history = train_autoencoder(
