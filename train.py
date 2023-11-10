@@ -38,19 +38,6 @@ def validate_epoch(model, dataloader, loss_fn, device):
     
     return epoch_loss
 
-
-def make_losses_plot(history):
-    # Plot training & validation loss values
-    plt.figure(figsize=(10, 5))
-    plt.plot(history['train_loss'], label='Train Loss')
-    plt.plot(history['val_loss'], label='Validation Loss')
-    plt.title('Model Loss Progression')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(loc='upper right')
-    plt.grid(True)
-    plt.show()
-
 #MAIN 
 def train_autoencoder(model, criterion, optimizer, train_loader, val_loader, num_epochs, device):
     """
@@ -108,3 +95,23 @@ def train_autoencoder(model, criterion, optimizer, train_loader, val_loader, num
         print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
     
     return history
+
+
+
+def load_model(model_path, model_class, device):
+    model = model_class().to(device)
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    return model
+
+
+def make_losses_plot(history):
+    # Plot training & validation loss values
+    plt.figure(figsize=(10, 5))
+    plt.plot(history['train_loss'], label='Train Loss')
+    plt.plot(history['val_loss'], label='Validation Loss')
+    plt.title('Model Loss Progression')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(loc='upper right')
+    plt.grid(True)
+    plt.show()
