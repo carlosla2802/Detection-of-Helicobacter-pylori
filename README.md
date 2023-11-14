@@ -1,10 +1,8 @@
 # Detection-of-Helicobacter-pylori
 
-This challenge addresses the detection of Helicobacter pylori a bacterium classified since 1994 as class 1 carcinogen to humans. By its highest specificity and sensitivity, the preferred diagnosis technique is the analysis of histological images with immunohistochemical staining, a process in which certain stained antibodies bind to antigens of the biological element of interest. This analysis is a time demanding task, which is currently done by an expert pathologist that visually inspects the digitized samples.
+Este reto se basa en la detección de la bacteria Helicobacter pylori, clasificada como cancerígena de clase 1 para humanos. Por su alta especificidad y sensibilidad, la técnica más óptima de diagnóstico es el análisis de imágenes histológicas con coloración inmunohistoquímica, un proceso en que ciertos anticuerpos tintados se unen a antígenos del elemento biológico de interés. Este análisis requiere tiempo, y actualmente revisado por un experto patólogo que inspecciona visualmente las muestras digitalizadas. 
 
-The goal will be to apply AI techiques for the detection of HPylori in inmunohistochemical histological images
-
-
+El objetivo será aplicar técnicas de inteligencia artificial para la detección de HPylori en imágenes histológicas immunohistoquiímicas.
 
 Basado en el artículo proporcionado, aquí hay un esquema con los pasos a seguir para realizar el proyecto en Python:
 
