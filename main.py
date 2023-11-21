@@ -66,7 +66,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
 
     n_values = [0,1,2,3,4,5]
-    fpr, tpr, thresholds, best_n = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=True)
+    fpr, tpr, thresholds, best_n = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False)
 
     pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, n=best_n)
 

@@ -93,26 +93,35 @@ def detect_h_pylori(original_images, reconstructed_images, plot_img=False, pacie
         plt.show()
 
     # Calcular la fracción de píxeles con tonalidades de color similares al rojo en las imágenes originales y reconstruidas
-    red_fraction_original = compute_red_fraction(original_only_red)
-    red_fraction_reconstructed = compute_red_fraction(reconstructed_only_red)
-
-    # Calcular la diferencia en la fracción de píxeles con tonalidades de color similares al rojo
-    red_fraction_difference = red_fraction_original - red_fraction_reconstructed
+    f_red = compute_f_red(original_only_red, reconstructed_only_red)
 
     # Etiquetar la ventana como que contiene H. pylori si la fracción perdida (red_fraction_difference) es mayor que 1
-    if red_fraction_difference > 1:
+    if f_red >= 1:
         return 1
     else:
         return -1
     
 
-# Función para calcular la fracción de píxeles con tonalidades de color similares al rojo en una imagen
-def compute_red_fraction(red_like_pixels):
-     
-    red_like_pixels = np.count_nonzero(red_like_pixels)
+# Función para calcular la fracción de píxeles con tonalidades de color similares al rojo perdidos en la reconstrucción
+def compute_f_red(original_only_red, reconstructed_only_red):
+    
+    # Calcular nº píxeles con tonalidades de color similares al rojo en las imágenes originales y reconstruidas
+    red_pixels_original = np.count_nonzero(original_only_red)
+    red_pixels_reconstructed = np.count_nonzero(reconstructed_only_red)
 
-    return red_like_pixels
+    # Calcular la diferencia de píxeles con tonalidades de color similares al rojo
+    red_pixels_loss = red_pixels_original - red_pixels_reconstructed
 
+    # Calcular Fred
+    if red_pixels_original != 0:
+        f_red = red_pixels_loss / red_pixels_original
+    elif red_pixels_loss == 0:
+        f_red = 1
+    else:
+        f_red = 0
+
+
+    return f_red
 
 
 def calculate_roc_curve_optimal_infected_windows_patient(real_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False):
