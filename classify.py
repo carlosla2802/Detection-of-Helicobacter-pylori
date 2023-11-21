@@ -115,7 +115,7 @@ def compute_red_fraction(red_like_pixels):
 
 
 
-def calculate_roc_curve(real_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False):
+def calculate_roc_curve_optimal_infected_windows_patient(real_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False):
     real_values = list(real_labels.values())
     fpr, tpr, thresholds, n_scores = [], [], [], []
 

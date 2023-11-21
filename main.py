@@ -2,7 +2,7 @@ from prep_data import prep_data_main
 from autoencoder import Autoencoder
 from train import train_autoencoder, load_model, make_losses_plot
 from eval import evaluate_model, visualize_reconstructions, save_model
-from classify import visualize_reconstructions2, detect_h_pylori_all_validation, calculate_metrics, evaluate_reconstructions, calculate_roc_curve
+from classify import visualize_reconstructions2, detect_h_pylori_all_validation, calculate_metrics, evaluate_reconstructions, calculate_roc_curve_optimal_infected_windows_patient
 
 
 import torch.nn as nn
@@ -66,7 +66,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
 
     n_values = [0,1,2,3,4,5]
-    fpr, tpr, thresholds, best_n = calculate_roc_curve(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=True)
+    fpr, tpr, thresholds, best_n = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=True)
 
     pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, n=best_n)
 
