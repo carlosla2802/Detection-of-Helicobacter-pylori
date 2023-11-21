@@ -51,14 +51,16 @@ def process_cropped_images(cropped_patches_df, cropped_images_dir):
     return patches_data
 
 
-def process_annotated_images(annotated_patches_df, annotated_images_dir):
+def process_annotated_images(annotated_patches_df, annotated_images_dir, labeled_patients_df):
     #Procesa las imágenes anotadas basándose en los metadatos proporcionados.
-    patches_data = []
+    pacients_data = {}
+    pacients_labels = {}
     for index, row in annotated_patches_df.iterrows():
         # Divide el patch_id en las partes necesarias
         patch_id_parts = row['ID'].split('.')
         image_folder = patch_id_parts[0]
         image_file = patch_id_parts[1] + '.png'
+        patient_id = patch_id_parts[0][:-2]
 
         # Construye la ruta de la carpeta y el archivo de la imagen
         image_folder_path = os.path.join(annotated_images_dir, image_folder)
@@ -67,11 +69,21 @@ def process_annotated_images(annotated_patches_df, annotated_images_dir):
         # Verifica si la ruta del archivo existe antes de procesar
         if os.path.exists(image_path):
             image_array = load_and_process_image(image_path)
-            patches_data.append((image_array, row['Presence']))
+            if patient_id not in list(pacients_data.keys()):
+                pacients_data[patient_id] = []
+                label_str = labeled_patients_df[labeled_patients_df["CODI"] == patient_id]["DENSITAT"].iloc[0]
+                if label_str == "NEGATIVA":
+                    label = -1
+                else:
+                    label = 1
+                pacients_labels[patient_id] = label
+
+            pacients_data[patient_id].append(image_array)
+
         else:
             print(f"No se encontró la imagen: {image_path}")
             
-    return patches_data
+    return pacients_data, pacients_labels
 
 
 def prepare_dataset(patches_data):
@@ -111,7 +123,7 @@ def create_dataloaders(X_train, y_train, X_val, y_val, batch_size=64):
     return train_loader, val_loader
 
 #MAIN
-def prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir, crapped_images_dir):
+def prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir, cropped_images_dir):
 
     # TRAINING AND VALIDATION DATALOADERS (SOLAMENTE IMAGENES NO INFECTADAS DEL DATASET CROPPED)
     # Cargar metadata
@@ -121,7 +133,7 @@ def prep_data_main(annotated_patches_path, labeled_patients_path, annotated_imag
     non_infected_patches_df = labeled_patients_df[labeled_patients_df['DENSITAT'] == 'NEGATIVA']
 
     # Procesar imágenes cropped de pacientes no infectados
-    non_infected_patches_data = process_cropped_images(non_infected_patches_df, crapped_images_dir)
+    non_infected_patches_data = process_cropped_images(non_infected_patches_df, cropped_images_dir)
 
     # Preparar el conjunto de datos de pacientes no infectados del dataset cropped
     non_infected_data_array,  non_infected_patches_labels_array = prepare_dataset(non_infected_patches_data)
@@ -148,19 +160,25 @@ def prep_data_main(annotated_patches_path, labeled_patients_path, annotated_imag
     annotated_patches_df = load_metadata(annotated_patches_path)
 
     # Procesar imagenes anotadas de pacientes infectados / no infectados
-    validation_patches_data = process_annotated_images(annotated_patches_df, annotated_images_dir)
+    pacients_data, pacients_labels = process_annotated_images(annotated_patches_df, annotated_images_dir, labeled_patients_df)
 
-    # Preparar conjunto de datos para validar las clasificaciones
-    validation_patches_data_array,  validation_labels_array = prepare_dataset(validation_patches_data)
-
-    # Converetir a tensores de PyTorch
-    validation_patches_data_tensor, _ = convert_to_tensors(validation_patches_data_array, validation_labels_array)
+    # To tensors
+    pacients_data_tensors = {}
+    for key, array_list in pacients_data.items():
+        # Convertir la lista de arrays en un solo array numpy
+        combined_array = np.array(array_list)
+        # Transponer el array combinado
+        transposed_array = combined_array.transpose((0, 3, 1, 2))
+        # Convertir el array transpuesto en un tensor
+        tensor = torch.tensor(transposed_array, dtype=torch.float32)
+        # Guardar el tensor en el diccionario
+        pacients_data_tensors[key] = tensor
 
     # Normalizar los datos de no infectados si aún no lo están
-    validation_patches_data_tensor = normalize_tensors(validation_patches_data_tensor)
+    pacients_data_tensors = {key: [tensor.float() / 255 for tensor in tensors] for key, tensors in pacients_data_tensors.items()}
 
 
-    return non_infected_train_loader, non_infected_val_loader, validation_patches_data_tensor, validation_labels_array
+    return non_infected_train_loader, non_infected_val_loader, pacients_data_tensors, pacients_labels
 
 
 

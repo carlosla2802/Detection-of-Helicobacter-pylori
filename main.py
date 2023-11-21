@@ -2,7 +2,7 @@ from prep_data import prep_data_main
 from autoencoder import Autoencoder
 from train import train_autoencoder, load_model, make_losses_plot
 from eval import evaluate_model, visualize_reconstructions, save_model
-from classify import detect_h_pylori_all_validation, calculate_metrics, evaluate_reconstructions
+from classify import visualize_reconstructions2, detect_h_pylori_all_validation, calculate_metrics, evaluate_reconstructions, calculate_roc_curve
 
 
 import torch.nn as nn
@@ -19,7 +19,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
     labeled_images_dir = "CroppedPatches"
 
     # Preparar data
-    non_infected_train_loader, non_infected_val_loader, validation_patches_data_tensor, validation_patches_labels = prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir, labeled_images_dir)
+    non_infected_train_loader, non_infected_val_loader, pacients_data_tensors, pacients_labels = prep_data_main(annotated_patches_path, labeled_patients_path, annotated_images_dir, labeled_images_dir)
 
     # Crear o cargar el modelo
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -57,10 +57,20 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
         # Visualizar rconstrucciones
         visualize_reconstructions(reconstructions)
     
-    reconstructed_validation_patches_data_tensor = evaluate_reconstructions(autoencoder, validation_patches_data_tensor, device)
+    reconstructed_pacients_for_visualization = evaluate_reconstructions(autoencoder, pacients_data_tensors, device)
+    reconstructed_pacients_data_tensor = {pacient: [pair[1] for pair in pairs] for pacient, pairs in reconstructed_pacients_for_visualization.items()}
 
-    pred_labels = detect_h_pylori_all_validation(validation_patches_data_tensor, reconstructed_validation_patches_data_tensor)
-    report = calculate_metrics(validation_patches_labels, pred_labels)
+
+    if plot:
+        visualize_reconstructions2(reconstructed_pacients_for_visualization)
+
+
+    n_values = [0,1,2,3,4,5]
+    fpr, tpr, thresholds, best_n = calculate_roc_curve(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=True)
+
+    pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, n=best_n)
+
+    report = calculate_metrics(pacients_labels, pred_labels)
 
     print("Metrics of the classification method: \n", report)
 
