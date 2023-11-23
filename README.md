@@ -23,9 +23,12 @@ Basado en el artículo proporcionado, aquí hay un esquema con los pasos a segui
 5. **Definición de Métricas y Umbral:**
    * Definir la métrica Fred para cuantificar la presencia de H. pylori basada en la pérdida de píxeles rojizos.
    * Establecer un umbral óptimo de Fred usando la curva ROC para la clasificación final de las muestras.
+   * Establecer un umbral óptimo de prop. de ventanas infectadas por paciente para la clasificación final de los pacientes.
 6. **Evaluación del Modelo:**
    * Calcular métricas de rendimiento como la precisión, la sensibilidad (recall), y el puntaje F1 para cada clase diagnóstica.
    * Realizar validación cruzada (por ejemplo, mediante 10 folds) para evaluar la robustez del modelo.
+
+Next steps:
 7. **Integración y Prueba del Sistema:**
    * Integrar el proceso en un sistema que pueda tomar una imagen WSI y proporcionar un diagnóstico automático.
    * Probar el sistema con un conjunto de datos independiente para validar su rendimiento.
