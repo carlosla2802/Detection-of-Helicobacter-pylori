@@ -29,6 +29,7 @@ Basado en el artículo proporcionado, aquí hay un esquema con los pasos a segui
    * Realizar validación cruzada (por ejemplo, mediante 10 folds) para evaluar la robustez del modelo.
 
 Next steps:
+
 7. **Integración y Prueba del Sistema:**
    * Integrar el proceso en un sistema que pueda tomar una imagen WSI y proporcionar un diagnóstico automático.
    * Probar el sistema con un conjunto de datos independiente para validar su rendimiento.
