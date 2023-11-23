@@ -96,7 +96,7 @@ def detect_h_pylori(original_images, reconstructed_images, plot_img=False, pacie
     f_red = compute_f_red(original_only_red, reconstructed_only_red)
 
     # Etiquetar la ventana como que contiene H. pylori si la fracción perdida (red_fraction_difference) es mayor que 1
-    if f_red >= 1:
+    if f_red >= 0:
         return 1
     else:
         return -1
@@ -115,8 +115,7 @@ def compute_f_red(original_only_red, reconstructed_only_red):
     # Calcular Fred
     if red_pixels_original != 0:
         f_red = red_pixels_loss / red_pixels_original
-    elif red_pixels_loss == 0:
-        f_red = 1
+
     else:
         f_red = 0
 
@@ -127,7 +126,7 @@ def compute_f_red(original_only_red, reconstructed_only_red):
 def calculate_roc_curve_optimal_infected_windows_patient(real_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False):
     real_values = list(real_labels.values())
     fpr, tpr, thresholds, n_scores = [], [], [], []
-
+    
     for n in n_values:
         pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, n, plot_img)
         pred_values = list(pred_labels.values())

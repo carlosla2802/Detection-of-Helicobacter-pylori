@@ -64,7 +64,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
     if plot:
         visualize_reconstructions2(reconstructed_pacients_for_visualization)
 
-
+    
     n_values = [0,1,2,3,4,5]
     fpr, tpr, thresholds, best_n = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False)
 
