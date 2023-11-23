@@ -36,7 +36,7 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
 
         # Entrenar el modelo
         autoencoder.to(device)
-        num_epochs = 10 # Ajustar num epochs
+        num_epochs = 20 # Ajustar num epochs
         
         history = train_autoencoder(
             autoencoder, criterion, optimizer, non_infected_train_loader, non_infected_val_loader, num_epochs, device
@@ -64,15 +64,18 @@ def main(use_pretrained=False, pretrained_path=None, plot=True):
     if plot:
         visualize_reconstructions2(reconstructed_pacients_for_visualization)
 
-    
-    n_values = [0,1,2,3,4,5]
-    fpr, tpr, thresholds, best_n = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, n_values, plot_img=False)
+    f_red_thresholds = [-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.1]
+    prop_infected_thresholds = [0, 0.1, 0.2, 0.3, 0.6, 0.8]
+    best_combination = calculate_roc_curve_optimal_infected_windows_patient(pacients_labels, pacients_data_tensors, reconstructed_pacients_data_tensor, f_red_thresholds, prop_infected_thresholds, plot_img=False)
+    best_f_red = best_combination[0]
+    best_prop_infected = best_combination[1]
 
-    pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, n=best_n)
+    print(f"Best Fred: {best_f_red}, Best prop. infected: {best_prop_infected}")
+    pred_labels = detect_h_pylori_all_validation(pacients_data_tensors, reconstructed_pacients_data_tensor, f_red_threshold=best_f_red, prop_infected_threshold=best_prop_infected)
 
     report = calculate_metrics(pacients_labels, pred_labels)
 
-    print("Metrics of the classification method: \n", report)
+    print("Report of the classification method: \n", report)
 
 
 if __name__ == '__main__':
